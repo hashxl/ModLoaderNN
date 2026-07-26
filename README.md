@@ -85,22 +85,22 @@ If you see this, the loader is installed and ready for mods.
 
 ## 4. Install a Mod (for players)
 
-Each mod is a folder placed in the **game's root directory** (next to the .exe). The folder must contain a `manifest.json` and the mod's `.dll` file.
+Each mod is a folder placed inside the mods directory in the game's root directory (next to the .exe). If the mods folder does not exist, create it. Every mod folder must contain a manifest.json and the mod's .dll file.
 
-1. Download the mod (usually a .zip file)
-2. Extract it to a folder in the game's root directory
-3. Verify the folder structure looks like this:
-
+Download the mod (usually a .zip file).
+Create a mods folder in the game's root directory if it doesn't already exist.
+Extract the mod into the mods folder.
+Verify the folder structure looks like this:
 ```
 Third Crisis Neon Nights/
-  MyCoolMod/               ← mod folder (name can be anything)
-    manifest.json          ← required
-    MyCoolMod.dll          ← the compiled mod
-    assets/                ← sprites, images (optional)
+  mods/
+    MyCoolMod/             ← mod folder (name can be anything)
+      manifest.json        ← required
+      MyCoolMod.dll        ← the compiled mod
+      assets/              ← sprites, images (optional)
   BepInEx/
   Third Crisis Neon Nights.exe
 ```
-
 4. Launch the game — the mod loads automatically
 5. Check `BepInEx/LogOutput.log` to confirm it loaded
 
