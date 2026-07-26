@@ -111,7 +111,12 @@ Third Crisis Neon Nights/
   "Name": "MyCoolMod",
   "Author": "YourName",
   "Version": "v1.0.0",
-  "PathToDLL": "MyCoolMod.dll"
+  "PathToDLL": "MyCoolMod.dll",
+  "Requires": {
+    "neonnightsdk": "v0.2.0"
+  },
+  "Enabled:true
+
 }
 ```
 
