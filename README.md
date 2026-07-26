@@ -115,7 +115,7 @@ Third Crisis Neon Nights/
   "Requires": {
     "neonnightsdk": "v0.2.0"
   },
-  "Enabled:true
+  "Enabled":true
 
 }
 ```
@@ -144,7 +144,11 @@ Third Crisis Neon Nights/
   "Name": "MyMod",
   "Author": "YourName",
   "Version": "v1.0.0",
-  "PathToDLL": "MyMod.dll"
+  "PathToDLL": "MyMod.dll",
+  "Requires": {
+    "neonnightsdk": "v0.2.0"
+  },
+  "Enabled":true
 }
 ```
 
