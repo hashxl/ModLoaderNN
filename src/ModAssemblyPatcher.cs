@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using BepInEx.Logging;
 using Mono.Cecil;
 
 namespace TCModLoader
@@ -16,12 +15,12 @@ namespace TCModLoader
         /// <summary>Bump this whenever the patching rules in PatchAssembly change, to invalidate stale cache entries.</summary>
         private const string PatcherVersion = "1";
 
-        internal static byte[] PatchModDll(string dllPath, ManualLogSource log)
+        internal static byte[] PatchModDll(string dllPath, LoaderLog log)
         {
             var sourceBytes = File.ReadAllBytes(dllPath);
             var cacheKey = ComputeCacheKey(sourceBytes);
 
-            var cacheDir = Path.Combine(Path.GetDirectoryName(UnityEngine.Application.dataPath), "BepInEx", "cache", "TCModLoader");
+            var cacheDir = StandalonePaths.CacheDirectory;
             var cachePath = Path.Combine(cacheDir, cacheKey + ".dll");
 
             if (File.Exists(cachePath))
@@ -59,22 +58,16 @@ namespace TCModLoader
             }
         }
 
-        private static byte[] PatchAssembly(string dllPath, ManualLogSource log)
+        private static byte[] PatchAssembly(string dllPath, LoaderLog log)
         {
             var resolver = new DefaultAssemblyResolver();
             resolver.AddSearchDirectory(Path.GetDirectoryName(dllPath));
 
-            var managedDir = Path.Combine(UnityEngine.Application.dataPath, "Managed");
+            var managedDir = StandalonePaths.ManagedDirectory;
             if (Directory.Exists(managedDir))
                 resolver.AddSearchDirectory(managedDir);
 
-            var bepInExCore = Path.Combine(Path.GetDirectoryName(UnityEngine.Application.dataPath), "BepInEx", "core");
-            if (Directory.Exists(bepInExCore))
-                resolver.AddSearchDirectory(bepInExCore);
-
-            var pluginsDir = Path.Combine(Path.GetDirectoryName(UnityEngine.Application.dataPath), "BepInEx", "plugins");
-            if (Directory.Exists(pluginsDir))
-                resolver.AddSearchDirectory(pluginsDir);
+            resolver.AddSearchDirectory(StandalonePaths.RuntimeDirectory);
 
             using (var module = ModuleDefinition.ReadModule(dllPath,
                 new ReaderParameters { AssemblyResolver = resolver, ReadWrite = false }))

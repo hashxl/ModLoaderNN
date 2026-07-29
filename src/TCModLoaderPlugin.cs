@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using BepInEx;
-using BepInEx.Logging;
 using Modding;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -13,10 +11,9 @@ using UnityEngine.SceneManagement;
 
 namespace TCModLoader
 {
-    [BepInPlugin("com.tcmodloader.bridge", "TCModLoader", "1.0.0")]
-    public class TCModLoaderPlugin : BaseUnityPlugin
+    public class TCModLoaderPlugin : MonoBehaviour
     {
-        internal static ManualLogSource Log;
+        internal static LoaderLog Log;
         internal static TCModLoaderPlugin Instance;
 
         private readonly List<LoadedMod> _loadedMods = new List<LoadedMod>();
@@ -25,25 +22,24 @@ namespace TCModLoader
         private void Awake()
         {
             Instance = this;
-            Log = Logger;
             DontDestroyOnLoad(gameObject);
 
             AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
 
             try
             {
-                Logger.LogWarning("=== TCModLoader v1.0.0 starting ===");
+                Log.LogWarning("=== TCModLoader v1.0.0 starting ===");
 
                 var selfAsm = typeof(TCModLoaderPlugin).Assembly;
                 var itcType = selfAsm.GetType("ITCMod");
-                Logger.LogInfo($"Self-check: ITCMod = {itcType?.FullName ?? "NOT FOUND"} in {selfAsm.GetName().Name} v{selfAsm.GetName().Version}");
+                Log.LogInfo($"Self-check: ITCMod = {itcType?.FullName ?? "NOT FOUND"} in {selfAsm.GetName().Name} v{selfAsm.GetName().Version}");
 
                 LoadAllMods();
-                Logger.LogWarning($"=== TCModLoader ready: {_loadedMods.Count} mod(s) loaded ===");
+                Log.LogWarning($"=== TCModLoader ready: {_loadedMods.Count} mod(s) loaded ===");
             }
             catch (Exception ex)
             {
-                Logger.LogError($"TCModLoader FATAL: {ex}");
+                Log.LogError($"TCModLoader FATAL: {ex}");
             }
 
             // This plugin's own GameObject is created during the game's initial
@@ -98,7 +94,7 @@ namespace TCModLoader
                     return asm;
             }
 
-            var managedDir = Path.Combine(UnityEngine.Application.dataPath, "Managed");
+            var managedDir = StandalonePaths.ManagedDirectory;
             var dllPath = Path.Combine(managedDir, name.Name + ".dll");
             if (File.Exists(dllPath))
             {
@@ -149,8 +145,7 @@ namespace TCModLoader
 
         private void LoadAllMods()
         {
-            var gameDir = Path.GetDirectoryName(Application.dataPath);
-            var modsDir = Path.Combine(gameDir, "Mods");
+            var modsDir = StandalonePaths.ModsDirectory;
 
             if (!Directory.Exists(modsDir))
             {

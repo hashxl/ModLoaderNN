@@ -6,3 +6,5 @@ bin/Debug/
 *.suo
 .vs/
 .idea/
+Cache/
+Logs/

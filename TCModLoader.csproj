@@ -12,24 +12,16 @@
   <PropertyGroup>
     <GameDir>..</GameDir>
     <ManagedDir>$(GameDir)\Third Crisis Neon Nights_Data\Managed</ManagedDir>
-    <BepInExDir>$(GameDir)\BepInEx</BepInExDir>
+    <RuntimeDir>$(GameDir)\TCModLoader\Runtime</RuntimeDir>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="BepInEx">
-      <HintPath>$(BepInExDir)\core\BepInEx.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="0Harmony">
-      <HintPath>$(BepInExDir)\core\0Harmony.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
     <Reference Include="Mono.Cecil">
-      <HintPath>$(BepInExDir)\core\Mono.Cecil.dll</HintPath>
+      <HintPath>$(RuntimeDir)\Mono.Cecil.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Mono.Cecil.Rocks">
-      <HintPath>$(BepInExDir)\core\Mono.Cecil.Rocks.dll</HintPath>
+      <HintPath>$(RuntimeDir)\Mono.Cecil.Rocks.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine">
@@ -52,6 +44,7 @@
       <HintPath>$(ManagedDir)\Newtonsoft.Json.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 
 </Project>

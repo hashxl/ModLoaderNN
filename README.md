@@ -1,12 +1,12 @@
 # TCModLoader — Modding Guide for Third Crisis: Neon Nights
 
-Everything you need to install the mod loader, use existing mods, or create your own from scratch. Covers BepInEx setup, the ITCMod API, and mod project structure.
+Everything you need to install the standalone mod loader, use existing mods, or create your own from scratch. Covers Doorstop setup, the ITCMod API, and mod project structure.
 
 ## Contents
 
 1. [What is TCModLoader](#1-what-is-tcmodloader)
 2. [Prerequisites](#2-prerequisites)
-3. [Install BepInEx + TCModLoader](#3-install-bepinex--tcmodloader)
+3. [Install TCModLoader](#3-install-tcmodloader)
 4. [Install a Mod (for players)](#4-install-a-mod-for-players)
 5. [Create Your Own Mod](#5-create-your-own-mod)
 
@@ -14,7 +14,7 @@ Everything you need to install the mod loader, use existing mods, or create your
 
 ## 1. What is TCModLoader
 
-**TCModLoader** is a BepInEx plugin that brings mod support to *Third Crisis: Neon Nights*. The game does not include mod support or BepInEx out of the box — you need to install both manually. TCModLoader reimplements the `ITCMod` interface, `ModManifest`, and `ModSpriteResolver` so that mods compiled against those types load and run.
+**TCModLoader** is a standalone Unity Doorstop plugin that brings mod support to *Third Crisis: Neon Nights*. BepInEx is not required. TCModLoader reimplements the `ITCMod` interface, `ModManifest`, and `ModSpriteResolver` so that mods compiled against those types load and run.
 
 It works by using **Mono.Cecil** to patch each mod's DLL at load time, redirecting type references from the old `Assembly-CSharp` to `TCModLoader.dll`. This is transparent to mod authors — you write code against the same API, and the loader handles the rest.
 
@@ -25,7 +25,7 @@ It works by using **Mono.Cecil** to patch each mod's DLL at load time, redirecti
 ### For players (installing mods)
 
 - Third Crisis: Neon Nights (Steam version)
-- **BepInEx 5.4.23** (Unity Mono, x64) — must be downloaded and installed manually
+- The TCModLoader standalone package, including Unity Doorstop
 
 ### For mod creators
 
@@ -39,38 +39,28 @@ Everything above, plus:
 
 ---
 
-## 3. Install BepInEx + TCModLoader
+## 3. Install TCModLoader
 
-### Step 1 — Install BepInEx
-
-The game does **not** come with BepInEx. You need to download and install it manually.
-
-1. Download **BepInEx 5.4.23** (Unity Mono, x64) from the official GitHub releases
-2. Extract the contents of the zip **into the game's root folder** (where `Third Crisis Neon Nights.exe` is)
-3. Launch the game **once** and close it — BepInEx will generate the folder structure (`BepInEx/plugins/`, `BepInEx/config/`, etc.)
-
-> **Important:** Make sure you download **BepInEx 5.x** (not 6.x). The game uses Unity Mono, so pick the `BepInEx_win_x64_5.4.23.2.zip` package. After extracting, you should see `winhttp.dll` and `doorstop_config.ini` next to the game's .exe.
-
-### Step 2 — Install TCModLoader
-
-Download `TCModLoader.dll` from the releases and place it in the BepInEx plugins folder:
+Extract the standalone package into the game's root folder:
 
 ```
 Third Crisis Neon Nights/
-  winhttp.dll                 ← from BepInEx
-  doorstop_config.ini         ← from BepInEx
-  BepInEx/                    ← created after first launch
-    plugins/
-      TCModLoader.dll         ← put it here
-    core/
-    cache/
+  winhttp.dll
+  doorstop_config.ini
+  TCModLoader/
+    Runtime/
+      TCModLoader.dll
+      Mono.Cecil.dll
+      Mono.Cecil.Rocks.dll
+    Cache/
+    Logs/
   Third Crisis Neon Nights_Data/
   Third Crisis Neon Nights.exe
 ```
 
-### Step 3 — Verify
+### Verify
 
-Launch the game again. Check `BepInEx/LogOutput.log` — you should see:
+Launch the game and check `TCModLoader/Logs/TCModLoader.log`:
 
 ```
 [Warning: TCModLoader] === TCModLoader v1.0.0 starting ===
@@ -79,7 +69,7 @@ Launch the game again. Check `BepInEx/LogOutput.log` — you should see:
 
 If you see this, the loader is installed and ready for mods.
 
-> **Updating the loader:** If you update TCModLoader.dll, delete `BepInEx/cache/chainloader_typeloader.dat` to force BepInEx to re-scan the plugins folder.
+> **Updating the loader:** Replace `TCModLoader/Runtime/TCModLoader.dll`. Delete `TCModLoader/Cache` only when patched mod assemblies need to be rebuilt.
 
 ---
 
@@ -98,11 +88,11 @@ Third Crisis Neon Nights/
       manifest.json        ← required
       MyCoolMod.dll        ← the compiled mod
       assets/              ← sprites, images (optional)
-  BepInEx/
+  TCModLoader/
   Third Crisis Neon Nights.exe
 ```
 4. Launch the game — the mod loads automatically
-5. Check `BepInEx/LogOutput.log` to confirm it loaded
+5. Check `TCModLoader/Logs/TCModLoader.log` to confirm it loaded
 
 ### manifest.json format
 
@@ -162,13 +152,13 @@ This tells .NET how to build the project and where to find the game's DLLs:
     <!-- Paths relative to the mod folder -->
     <GameDir>..</GameDir>
     <ManagedDir>$(GameDir)\Third Crisis Neon Nights_Data\Managed</ManagedDir>
-    <BepInExDir>$(GameDir)\BepInEx</BepInExDir>
+    <TCModLoaderDir>$(GameDir)\TCModLoader\Runtime</TCModLoaderDir>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- TCModLoader (provides ITCMod, ModManifest, ModSpriteResolver) -->
     <Reference Include="TCModLoader">
-      <HintPath>$(BepInExDir)\plugins\TCModLoader.dll</HintPath>
+      <HintPath>$(TCModLoaderDir)\TCModLoader.dll</HintPath>
       <Private>false</Private>
     </Reference>
 
@@ -242,14 +232,14 @@ dotnet build -c Release --no-incremental
 # Copy DLL to mod folder
 cp bin/Release/MyMod.dll MyMod.dll
 
-# Clear BepInEx cache (if having issues)
-del ..\BepInEx\cache\chainloader_typeloader.dat
+# Clear TCModLoader cache (if having issues)
+rmdir /s /q ..\TCModLoader\Cache
 ```
 
 1. Run `dotnet build -c Release --no-incremental` from your mod folder
 2. Copy `bin/Release/MyMod.dll` to the mod folder root (next to manifest.json)
 3. Launch the game
-4. Check `BepInEx/LogOutput.log` for `[MyMod] Hello, Neon Nights!`
+4. Check `TCModLoader/Logs/TCModLoader.log` and the Unity player log
 
 ### Step 6 — Distribute your mod
 
