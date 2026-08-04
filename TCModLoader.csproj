@@ -12,18 +12,10 @@
   <PropertyGroup>
     <GameDir>..</GameDir>
     <ManagedDir>$(GameDir)\Third Crisis Neon Nights_Data\Managed</ManagedDir>
-    <RuntimeDir>$(GameDir)\TCModLoader\Runtime</RuntimeDir>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Mono.Cecil">
-      <HintPath>$(RuntimeDir)\Mono.Cecil.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil.Rocks">
-      <HintPath>$(RuntimeDir)\Mono.Cecil.Rocks.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
+    <PackageReference Include="Mono.Cecil" Version="0.10.4" />
     <Reference Include="UnityEngine">
       <HintPath>$(ManagedDir)\UnityEngine.dll</HintPath>
       <Private>false</Private>
